@@ -1,0 +1,191 @@
+scratchie-roi-calculator/
+└── src/
+    ├── App.jsx
+    ├── main.jsx
+    ├── index.css
+    ├── App.css
+    ├── App_backup_before_refactor.jsx
+    ├── assets/
+    │   ├── scratchie-logo.png
+    │   └── react.svg
+    ├── data/
+    │   ├── countrySettings.js
+    │   ├── industryDefaults.js
+    │   └── sectors.js
+    └── components/
+        ├── Header.jsx
+        ├── RegionIndustrySection.jsx
+        ├── SiteBasicsSection.jsx
+        ├── SafetyProgramSection.jsx
+        ├── EfficiencyImpactSection.jsx
+        ├── ROISummarySection.jsx
+        ├── SectionCard.jsx
+        ├── InputField.jsx
+        ├── CheckboxField.jsx
+        └── Dropdown.jsx
+
+------------------------------------------------------------
+src/main.jsx
+------------------------------------------------------------
+console.log('Main loaded');
+import { StrictMode } from 'react'
+import { createRoot } from 'react-dom/client'
+import './index.css'
+import App from './App.jsx'
+
+createRoot(document.getElementById('root')).render(
+  <StrictMode>
+    <App />
+  </StrictMode>,
+)
+
+------------------------------------------------------------
+src/components/Header.jsx
+------------------------------------------------------------
+import React from 'react';
+import logo from '../assets/scratchie-logo.png';
+
+const SCRATCHIE_ORANGE = '#F97115';
+
+const Header = () => (
+  <header className="p-6 bg-gray-800 text-white flex flex-col md:flex-row justify-between items-center">
+    <div>
+      <h1 className="text-3xl font-bold mb-1" style={{color: SCRATCHIE_ORANGE}}>Scratchie ROI Calculator</h1>
+      <p className="text-gray-300 text-sm">Build your business case for safety and engagement.</p>
+    </div>
+    <img src={logo} alt="Scratchie Logo" className="h-10 md:h-12 mt-3 md:mt-0" />
+  </header>
+);
+
+export default Header; 
+
+------------------------------------------------------------
+src/components/RegionIndustrySection.jsx
+------------------------------------------------------------
+import React from 'react';
+import Dropdown from './Dropdown';
+import SectionCard from './SectionCard';
+
+const RegionIndustrySection = ({ inputs, handleInputChange, setCurrentStep, countrySettings, sectors, industryDefaults }) => (
+    <SectionCard title="Region & Industry" color="orange" icon="🌍">
+        <Dropdown label="Select Country" name="country" value={inputs.country} onChange={handleInputChange} options={Object.keys(countrySettings).map(c => ({value: c, label: c === 'AU' ? 'Australia' : 'United States'}))} placeholder="Select Country"/>
+        <Dropdown label="Select Primary Sector" name="sector" value={inputs.sector} onChange={handleInputChange} options={Object.keys(sectors).map(sKey => ({value: sKey, label: sectors[sKey].name}))} placeholder="Select Primary Sector"/>
+        {inputs.sector && sectors[inputs.sector]?.subSectors && (
+            <Dropdown 
+              label={`Select Sub-Sector for ${sectors[inputs.sector].name}`} 
+              name="subSector" 
+              value={inputs.subSector} 
+              onChange={handleInputChange} 
+              options={sectors[inputs.sector].subSectors.map(sub => ({value: sub, label: industryDefaults[inputs.country]?.[inputs.sector]?.[sub]?.name || sub }))} 
+              placeholder="Select Sub-Sector (Optional)"
+            />
+        )}
+        <button onClick={() => setCurrentStep(2)} disabled={!inputs.country || !inputs.sector} className="w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150 disabled:opacity-50 disabled:cursor-not-allowed">Next: Site Basics</button>
+    </SectionCard>
+);
+
+export default RegionIndustrySection; 
+
+------------------------------------------------------------
+src/components/SiteBasicsSection.jsx
+------------------------------------------------------------
+import React from 'react';
+import InputField from './InputField';
+import SectionCard from './SectionCard';
+
+const SiteBasicsSection = ({ inputs, handleInputChange, setCurrentStep, currencySymbol }) => (
+    <SectionCard title="Site/Project Basics" color="blue" icon="🏗️">
+        <InputField label="Peak Number of Workers (including subcontractors)" name="peakNumWorkers" value={inputs.peakNumWorkers} onChange={handleInputChange} unit="workers" helperText="Max number of workers on site/project at any time." currencySymbol={currencySymbol}/>
+        <InputField label="Calculation Period" name="calculationPeriod" value={inputs.calculationPeriod} onChange={handleInputChange} unit="months" helperText="Duration for ROI calculation (e.g., project length or annual)." currencySymbol={currencySymbol}/>
+        <InputField label="Average Worker Hourly Rate" name="workerHourlyRate" value={inputs.workerHourlyRate} onChange={handleInputChange} unit="$" helperText="Blended gross hourly rate for workers." currencySymbol={currencySymbol}/>
+        <div className="flex justify-between mt-4">
+            <button onClick={() => setCurrentStep(1)} className="text-gray-600 hover:text-orange-500 font-medium py-2 px-4 rounded-lg">Back</button>
+            <button onClick={() => setCurrentStep(3)} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">Next: Safety & Program</button>
+        </div>
+    </SectionCard>
+);
+
+export default SiteBasicsSection; 
+
+------------------------------------------------------------
+src/components/SafetyProgramSection.jsx
+------------------------------------------------------------
+import React from 'react';
+import InputField from './InputField';
+import CheckboxField from './CheckboxField';
+import SectionCard from './SectionCard';
+
+const SafetyProgramSection = ({ inputs, handleInputChange, setCurrentStep, trirUnit, currencySymbol }) => (
+    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <SectionCard title="Current Safety Metrics" color="red" icon="⚠️">
+            <InputField label={`Current Incident Rate (${trirUnit})`} name="incidentRate" value={inputs.incidentRate} onChange={handleInputChange} helperText="Your site's TRIR. Suggested based on sector." step="0.1" currencySymbol={currencySymbol}/>
+            <InputField label="Average Cost Per Incident" name="costPerIncident" value={inputs.costPerIncident} onChange={handleInputChange} unit="$" helperText="Total direct/indirect costs. Suggested based on sector." currencySymbol={currencySymbol}/>
+            <InputField label="Expected Incident Reduction with Scratchie" name="incidentReduction" value={inputs.incidentReduction} onChange={handleInputChange} unit="%" helperText="Typical range: 18-30%." currencySymbol={currencySymbol}/>
+        </SectionCard>
+        <SectionCard title="Recognition Program Setup" color="purple" icon="🏆">
+            <InputField label="Monthly Cash Reward Budget per Worker" name="rewardBudget" value={inputs.rewardBudget} onChange={handleInputChange} unit="$" helperText="$5-50 recommended. Includes processing fees." currencySymbol={currencySymbol}/>
+            <CheckboxField label="Include On-Site Scratchie Training?" name="includeOnSiteTraining" checked={inputs.includeOnSiteTraining} onChange={handleInputChange} helperText={`Adds one-time cost (e.g., ${currencySymbol}${inputs.country === 'AU' ? '2,000' : '1,500'}).`}/>
+            <InputField label="Admin Setup Hours (One-time)" name="adminHours" value={inputs.adminHours} onChange={handleInputChange} unit="hours" helperText="Internal time for initial setup." currencySymbol={currencySymbol}/>
+            <InputField label="Admin Hourly Rate" name="adminRate" value={inputs.adminRate} onChange={handleInputChange} unit="$" helperText="For setup cost & ongoing admin time savings." currencySymbol={currencySymbol}/>
+        </SectionCard>
+        <div className="md:col-span-2 flex justify-between mt-2">
+            <button onClick={() => setCurrentStep(2)} className="text-gray-600 hover:text-orange-500 font-medium py-2 px-4 rounded-lg">Back</button>
+            <button onClick={() => setCurrentStep(4)} className="bg-orange-500 hover:bg-orange-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">Next: Efficiency</button>
+        </div>
+    </div>
+);
+
+export default SafetyProgramSection; 
+
+------------------------------------------------------------
+src/components/EfficiencyImpactSection.jsx
+------------------------------------------------------------
+import React from 'react';
+import InputField from './InputField';
+import SectionCard from './SectionCard';
+
+const EfficiencyImpactSection = ({ inputs, handleInputChange, setCurrentStep, currencySymbol }) => (
+    <SectionCard title="Efficiency & Impact Factors" color="green" icon="⏱️">
+        <InputField label="Time Saved per Digital Hazard Report" name="timePerHazard" value={inputs.timePerHazard} onChange={handleInputChange} unit="minutes" helperText="Compared to manual reporting / Take5 / Start Card etc." currencySymbol={currencySymbol}/>
+        <InputField label="Expected Monthly Hazard Reports per Worker (with Scratchie)" name="reportsPerWorker" value={inputs.reportsPerWorker} onChange={handleInputChange} unit="reports" helperText="Typically 2-10x increase. Default: 10." step="0.1" currencySymbol={currencySymbol}/>
+        <InputField label="Admin Hours Saved Monthly (by Platform)" name="adminHoursSaved" value={inputs.adminHoursSaved} onChange={handleInputChange} unit="hours" helperText="Time saved on safety admin tasks." currencySymbol={currencySymbol}/>
+        <div className="flex justify-between mt-4">
+            <button onClick={() => setCurrentStep(3)} className="text-gray-600 hover:text-orange-500 font-medium py-2 px-4 rounded-lg">Back</button>
+            <button onClick={() => setCurrentStep(5)} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">View ROI Summary</button>
+        </div>
+    </SectionCard>
+);
+
+export default EfficiencyImpactSection; 
+
+------------------------------------------------------------
+src/components/ROISummarySection.jsx
+------------------------------------------------------------
+(imports and 104 lines of code...)
+
+------------------------------------------------------------
+src/App.jsx
+------------------------------------------------------------
+(imports and 558 lines of code...)
+
+------------------------------------------------------------
+src/data/countrySettings.js
+------------------------------------------------------------
+export const countrySettings = {
+    AU: { currency: 'AUD', currencySymbol: '$', trirDenominator: 200000, trirUnit: 'per 200,000 hrs worked' },
+    US: { currency: 'USD', currencySymbol: '$', trirDenominator: 200000, trirUnit: 'per 200,000 hrs worked' },
+}; 
+
+------------------------------------------------------------
+src/data/industryDefaults.js
+------------------------------------------------------------
+(exported industryDefaults object...)
+
+------------------------------------------------------------
+src/data/sectors.js
+------------------------------------------------------------
+(exported sectors object...)
+
+------------------------------------------------------------
+
+</rewritten_file> 
