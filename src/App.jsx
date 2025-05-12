@@ -136,6 +136,7 @@ const ScratchieROICalculator = () => {
     timePerHazard: 1,
     reportsPerWorker: 10,
     adminHoursSaved: 15,
+    productivityGainPercent: 1.5,
   });
 
   const [results, setResults] = useState({
@@ -256,7 +257,7 @@ const ScratchieROICalculator = () => {
     const adminTimeSavingsTotal = safeAdminHoursSaved * safeAdminRate * safeCalculationPeriod;
     const monthlyWorkHoursPerWorker = 160;
     const totalLaborCostForProductivity = safePeakNumWorkers * safeCalculationPeriod * monthlyWorkHoursPerWorker * safeWorkerHourlyRate;
-    const productivityGain = totalLaborCostForProductivity * 0.015;
+    const productivityGain = totalLaborCostForProductivity * (parseFloat(inputs.productivityGainPercent) / 100);
 
 
     const totalBenefits = incidentCostSavings + hazardReportingValue + adminTimeSavingsTotal + productivityGain;
