@@ -6,7 +6,7 @@ const EfficiencyImpactSection = ({ inputs, handleInputChange, setCurrentStep, cu
     <SectionCard title="Efficiency & Impact Factors" color="green" icon="⏱️">
         <InputField label="Time Saved per Digital Hazard Report" name="timePerHazard" value={inputs.timePerHazard} onChange={handleInputChange} unit="minutes" helperText="Compared to manual reporting / Take5 / Start Card etc." currencySymbol={currencySymbol}/>
         <InputField label="Expected Monthly Hazard Reports per Worker (with Scratchie)" name="reportsPerWorker" value={inputs.reportsPerWorker} onChange={handleInputChange} unit="reports" helperText="Typically 2-10x increase. Default: 10." step="0.1" currencySymbol={currencySymbol}/>
-        <InputField label="Admin Hours Saved Monthly (by Platform)" name="adminHoursSaved" value={inputs.adminHoursSaved} onChange={handleInputChange} unit="hours" helperText="Time saved on safety admin tasks." currencySymbol={currencySymbol}/>
+        <InputField label="Admin Hours Saved Weekly (by Platform)" name="adminHoursSaved" value={inputs.adminHoursSaved} onChange={handleInputChange} unit="hours" helperText="Time saved on weekly safety admin tasks." currencySymbol={currencySymbol}/>
         <div className="mt-4">
             <label htmlFor="productivityGainPercent" className="block text-sm font-medium text-gray-700 mb-1">Productivity Gain (%)</label>
             <div className="flex items-center gap-3">

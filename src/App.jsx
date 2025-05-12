@@ -116,6 +116,26 @@ const Dropdown = ({ label, name, value, onChange, options, helperText, placehold
     </div>
 );
 
+// Helper function to calculate effective worker count for a given month
+const getEffectiveWorkerCount = (peakWorkers, month, sector) => {
+  if (sector !== 'construction') return peakWorkers;
+  
+  const rampUpPercentages = [0.1, 0.3, 0.6, 0.8, 1.0];
+  const monthIndex = Math.min(month, 4);
+  return peakWorkers * rampUpPercentages[monthIndex];
+};
+
+// Helper function to calculate average worker count over the calculation period
+const getAverageWorkerCount = (peakWorkers, calculationPeriod, sector) => {
+  if (sector !== 'construction') return peakWorkers;
+  
+  let totalWorkers = 0;
+  for (let month = 0; month < calculationPeriod; month++) {
+    totalWorkers += getEffectiveWorkerCount(peakWorkers, month, sector);
+  }
+  return totalWorkers / calculationPeriod;
+};
+
 // --- Main Calculator Component ---
 const ScratchieROICalculator = () => {
   const [currentStep, setCurrentStep] = useState(1);
@@ -133,9 +153,9 @@ const ScratchieROICalculator = () => {
     includeOnSiteTraining: false,
     adminHours: 10,
     adminRate: null,
-    timePerHazard: 1,
+    timePerHazard: 10,
     reportsPerWorker: 10,
-    adminHoursSaved: 15,
+    adminHoursSaved: 4,
     productivityGainPercent: 1.5,
   });
 
@@ -220,7 +240,7 @@ const ScratchieROICalculator = () => {
     const {
       peakNumWorkers, calculationPeriod, workerHourlyRate, incidentRate, costPerIncident,
       incidentReduction, rewardBudget, includeOnSiteTraining, adminHours, adminRate,
-      timePerHazard, reportsPerWorker, adminHoursSaved, country
+      timePerHazard, reportsPerWorker, adminHoursSaved, country, sector
     } = inputs;
 
     const safePeakNumWorkers = parseFloat(peakNumWorkers) || 0;
@@ -237,28 +257,28 @@ const ScratchieROICalculator = () => {
     const safeAdminHoursSaved = parseFloat(adminHoursSaved) || 0;
 
     const currentCountrySettings = countrySettings[country];
+    const averageWorkerCount = getAverageWorkerCount(safePeakNumWorkers, safeCalculationPeriod, sector);
 
-    const platformFee = safePeakNumWorkers * 5 * safeCalculationPeriod;
-    const rewardBudgetTotal = safePeakNumWorkers * safeRewardBudget * safeCalculationPeriod;
+    const platformFee = averageWorkerCount * 5 * safeCalculationPeriod;
+    const rewardBudgetTotal = averageWorkerCount * safeRewardBudget * safeCalculationPeriod;
     const trainingCost = includeOnSiteTraining ? (country === 'AU' ? 2000 : 1500) : 0;
     const adminSetupCost = safeAdminHours * safeAdminRate;
     const totalImplementationCost = platformFee + rewardBudgetTotal + trainingCost + adminSetupCost;
 
     const annualWorkHoursPerWorker = 2000;
-    const totalWorkHoursForPeriod = safePeakNumWorkers * annualWorkHoursPerWorker * (safeCalculationPeriod / 12);
+    const totalWorkHoursForPeriod = averageWorkerCount * annualWorkHoursPerWorker * (safeCalculationPeriod / 12);
     const expectedIncidentsCurrent = currentCountrySettings.trirDenominator > 0 ? (totalWorkHoursForPeriod / currentCountrySettings.trirDenominator) * safeIncidentRate : 0;
     const expectedIncidentsWithScratchie = expectedIncidentsCurrent * (1 - (safeIncidentReduction / 100));
     const incidentsPrevented = expectedIncidentsCurrent - expectedIncidentsWithScratchie;
     const incidentCostSavings = incidentsPrevented * safeCostPerIncident;
 
-    const totalMonthlyReports = safePeakNumWorkers * safeReportsPerWorker;
+    const totalMonthlyReports = averageWorkerCount * safeReportsPerWorker;
     const totalTimeSavedHours = (totalMonthlyReports * safeTimePerHazard * safeCalculationPeriod) / 60;
     const hazardReportingValue = totalTimeSavedHours * safeWorkerHourlyRate;
-    const adminTimeSavingsTotal = safeAdminHoursSaved * safeAdminRate * safeCalculationPeriod;
+    const adminTimeSavingsTotal = safeAdminHoursSaved * 4 * safeAdminRate * safeCalculationPeriod; // Multiply by 4 to convert weekly to monthly
     const monthlyWorkHoursPerWorker = 160;
-    const totalLaborCostForProductivity = safePeakNumWorkers * safeCalculationPeriod * monthlyWorkHoursPerWorker * safeWorkerHourlyRate;
+    const totalLaborCostForProductivity = averageWorkerCount * safeCalculationPeriod * monthlyWorkHoursPerWorker * safeWorkerHourlyRate;
     const productivityGain = totalLaborCostForProductivity * (parseFloat(inputs.productivityGainPercent) / 100);
-
 
     const totalBenefits = incidentCostSavings + hazardReportingValue + adminTimeSavingsTotal + productivityGain;
     const netBenefit = totalBenefits - totalImplementationCost;
@@ -269,7 +289,6 @@ const ScratchieROICalculator = () => {
     // A more common payback: if monthlyBenefit (gross) is positive
     const monthlyGrossBenefit = safeCalculationPeriod > 0 ? totalBenefits / safeCalculationPeriod : 0;
     const paybackPeriodCalc = monthlyGrossBenefit > 0 ? totalImplementationCost / monthlyGrossBenefit : (totalImplementationCost === 0 && totalBenefits > 0 ? 0 : Infinity);
-
 
     const benefitCostRatio = totalImplementationCost > 0 ? totalBenefits / totalImplementationCost : (totalBenefits > 0 ? Infinity : 0);
 
