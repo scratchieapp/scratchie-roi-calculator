@@ -179,7 +179,7 @@ const ScratchieROICalculator = () => {
     setInputs(prev => ({
         ...prev,
         workerHourlyRate: prev.workerHourlyRate === null ? (inputs.country === 'AU' ? 45 : 35) : prev.workerHourlyRate,
-        adminRate: prev.adminRate === null ? (inputs.country === 'AU' ? 60 : 50) : prev.adminRate,
+        adminRate: prev.adminRate === null ? 45 : prev.adminRate,
         // Reset sector-specific values if country changes and they were potentially from old country's defaults
         // This might be too aggressive, depends on desired UX. For now, let sector useEffect handle it.
     }));
@@ -213,6 +213,17 @@ const ScratchieROICalculator = () => {
         }));
     }
   }, [inputs.country, inputs.sector, inputs.subSector]);
+
+  // Set sector-specific defaults for hospitality
+  useEffect(() => {
+    if (inputs.sector === 'Hospitality') {
+        setInputs(prev => ({
+            ...prev,
+            workerHourlyRate: 28,
+            adminRate: prev.adminRate === null ? 45 : prev.adminRate,
+        }));
+    }
+  }, [inputs.sector]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
@@ -442,12 +453,16 @@ const ScratchieROICalculator = () => {
  
      currentY = _addSectionTitle("Core Inputs", currentY);
      currentY = Math.max(currentY, 20); // Ensure Y is not too low if previous table was short
+     
+     const isHospitality = inputs.sector === 'Hospitality';
+     const peakWorkersLabel = isHospitality ? 'Peak Number of Crew' : 'Peak Number of Workers';
+     
      doc.autoTable({
          startY: currentY, theme: 'grid', columnStyles: { 0: { cellWidth: 80 } },
          head: [['Parameter', 'Value']],
          body: [
              ['Calculation Period', `${formatNumber(inputs.calculationPeriod, 0)} months`],
-             ['Peak Number of Workers', formatNumber(inputs.peakNumWorkers, 0)],
+             [peakWorkersLabel, formatNumber(inputs.peakNumWorkers, 0)],
              [`Avg. Worker Hourly Rate (${currencySymbol})`, formatCurrency(inputs.workerHourlyRate, currency, currencySymbol)],
              [`Current Incident Rate (${trirUnit})`, formatNumber(inputs.incidentRate, 1)],
              [`Avg. Cost per Incident (${currencySymbol})`, formatCurrency(inputs.costPerIncident, currency, currencySymbol)],

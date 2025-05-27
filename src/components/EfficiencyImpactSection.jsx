@@ -4,8 +4,8 @@ import SectionCard from './SectionCard';
 
 const EfficiencyImpactSection = ({ inputs, handleInputChange, setCurrentStep, currencySymbol }) => (
     <SectionCard title="Efficiency & Impact Factors" color="green" icon="⏱️">
-        <InputField label="Time Saved per Digital Hazard Report" name="timePerHazard" value={inputs.timePerHazard} onChange={handleInputChange} unit="minutes" helperText="Compared to manual reporting / Take5 / Start Card etc." currencySymbol={currencySymbol}/>
-        <InputField label="Expected Monthly Hazard Reports per Worker (with Scratchie)" name="reportsPerWorker" value={inputs.reportsPerWorker} onChange={handleInputChange} unit="reports" helperText="Typically 2-10x increase. Default: 10." step="0.1" currencySymbol={currencySymbol}/>
+        <InputField label="Time Saved per Digital Hazard Report" name="timePerHazard" value={inputs.timePerHazard} onChange={handleInputChange} unit="minutes" helperText="Compared to manual reporting / Take5 / Start Card / Donesafe etc." currencySymbol={currencySymbol}/>
+        <InputField label="Expected Convo Card Hazard ID Reports per Worker each month" name="reportsPerWorker" value={inputs.reportsPerWorker} onChange={handleInputChange} unit="reports" helperText="Typically 2-10x increase. Default: 10." step="0.1" currencySymbol={currencySymbol}/>
         <InputField label="Admin Hours Saved Weekly (by Platform)" name="adminHoursSaved" value={inputs.adminHoursSaved} onChange={handleInputChange} unit="hours" helperText="Time saved on weekly safety admin tasks." currencySymbol={currencySymbol}/>
         <div className="mt-4">
             <label htmlFor="productivityGainPercent" className="block text-sm font-medium text-gray-700 mb-1">Productivity Gain (%)</label>

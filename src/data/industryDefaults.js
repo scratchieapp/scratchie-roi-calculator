@@ -1,8 +1,10 @@
 export const industryDefaults = {
     AU: {
         Hospitality: {
-            default: { trir: 4.5, cost: 18000 },
-            QSR: { trir: 5.0, cost: 15000, name: "Quick Service Retail (QSR)" }
+            default: { trir: 15, cost: 86000 },
+            QSR: { trir: 15, cost: 86000, name: "Quick Service Restaurants (QSR)" },
+            FSR: { trir: 15, cost: 86000, name: "Full Service Restaurants (FSR)" },
+            Hotels: { trir: 15, cost: 86000, name: "Hotels & Accommodation" }
         },
         Construction: {
             default: { trir: 9.0, cost: 45000 },
@@ -25,8 +27,10 @@ export const industryDefaults = {
     },
     US: {
         Hospitality: {
-            default: { trir: 3.0, cost: 20000 },
-            QSR: { trir: 3.2, cost: 18000, name: "Quick Service Retail (QSR)" }
+            default: { trir: 15, cost: 86000 },
+            QSR: { trir: 15, cost: 86000, name: "Quick Service Restaurants (QSR)" },
+            FSR: { trir: 15, cost: 86000, name: "Full Service Restaurants (FSR)" },
+            Hotels: { trir: 15, cost: 86000, name: "Hotels & Accommodation" }
         },
         Construction: {
             default: { trir: 2.9, cost: 40000 },
