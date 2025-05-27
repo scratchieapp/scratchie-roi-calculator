@@ -5,10 +5,17 @@ import SectionCard from './SectionCard';
 
 const SafetyProgramSection = ({ inputs, handleInputChange, setCurrentStep, trirUnit, currencySymbol }) => {
     const isHospitality = inputs.sector === 'Hospitality';
+    const isHotels = inputs.subSector === 'Hotels';
     const [showSafetyInfo, setShowSafetyInfo] = useState(false);
-    const incidentRateHelperText = isHospitality 
-        ? "Your restaurant's Lost Time Injury Frequency Rate. Suggested based on sector."
-        : "Your site's TRIR. Suggested based on sector.";
+    
+    let incidentRateHelperText = "Your site's TRIR. Suggested based on sector.";
+    if (isHospitality) {
+        if (isHotels) {
+            incidentRateHelperText = "Your hotel's Lost Time Injury Frequency Rate. Suggested based on sector.";
+        } else {
+            incidentRateHelperText = "Your restaurant's Lost Time Injury Frequency Rate. Suggested based on sector.";
+        }
+    }
     
     return (
         <div className="space-y-6">

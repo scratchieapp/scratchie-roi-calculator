@@ -4,12 +4,31 @@ import SectionCard from './SectionCard';
 
 const SiteBasicsSection = ({ inputs, handleInputChange, setCurrentStep, currencySymbol }) => {
     const isHospitality = inputs.sector === 'Hospitality';
-    const title = isHospitality ? "Restaurant Basics" : "Site/Project Basics";
-    const icon = isHospitality ? "🍴" : "🏗️";
-    const workerLabel = isHospitality ? "Peak Number of Crew" : "Peak Number of Workers (including subcontractors)";
-    const hourlyRateLabel = isHospitality ? "Average Hourly Rate (Crew)" : "Average Worker Hourly Rate";
+    const isHotels = inputs.subSector === 'Hotels';
+    
+    let title = "Site/Project Basics";
+    let icon = "🏗️";
+    let workerLabel = "Peak Number of Workers (including subcontractors)";
+    let hourlyRateLabel = "Average Worker Hourly Rate";
+    
+    if (isHospitality) {
+        if (isHotels) {
+            title = "Hotel Basics";
+            icon = "🏨";
+            workerLabel = "Peak Number of Staff";
+            hourlyRateLabel = "Average Hourly Rate (Staff)";
+        } else {
+            title = "Restaurant Basics";
+            icon = "🍴";
+            workerLabel = "Peak Number of Crew";
+            hourlyRateLabel = "Average Hourly Rate (Crew)";
+        }
+    }
+    
     const workerHelperText = isHospitality 
-        ? "Max number of crew members during peak operating hours." 
+        ? (isHotels 
+            ? "Max number of staff members during peak operating hours." 
+            : "Max number of crew members during peak operating hours.")
         : "Max number of workers on site/project at any time. For construction projects, we calculate based on a gradual ramp-up to this peak (10% month 1, 30% month 2, 60% month 3, 80% month 4, 100% from month 5). For non-project sectors like healthcare, this number remains constant.";
 
     return (

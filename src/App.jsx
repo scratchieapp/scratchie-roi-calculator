@@ -217,13 +217,14 @@ const ScratchieROICalculator = () => {
   // Set sector-specific defaults for hospitality
   useEffect(() => {
     if (inputs.sector === 'Hospitality') {
+        const workerRate = inputs.subSector === 'FSR' ? 35 : 28;
         setInputs(prev => ({
             ...prev,
-            workerHourlyRate: 28,
+            workerHourlyRate: workerRate,
             adminRate: prev.adminRate === null ? 45 : prev.adminRate,
         }));
     }
-  }, [inputs.sector]);
+  }, [inputs.sector, inputs.subSector]);
 
   const handleInputChange = (e) => {
     const { name, value, type, checked } = e.target;
