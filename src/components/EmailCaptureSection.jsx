@@ -54,23 +54,41 @@ const EmailCaptureSection = ({
           We'll send you a detailed PDF report that you can share with your team.
         </p>
         
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
-          <div className="flex items-start">
-            <div className="flex-shrink-0">
-              <svg className="h-5 w-5 text-orange-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-6 mb-6 max-w-2xl mx-auto">
+          <div className="text-center">
+            <div className="flex justify-center mb-3">
+              <svg className="h-6 w-6 text-orange-500" viewBox="0 0 20 20" fill="currentColor">
                 <path fillRule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
               </svg>
             </div>
-            <div className="ml-3">
-              <h4 className="text-sm font-medium text-orange-800">
-                What you'll receive:
-              </h4>
-              <ul className="mt-2 text-sm text-orange-700 list-disc list-inside">
-                <li>Detailed PDF business case summary</li>
-                <li>All your inputs and calculated results</li>
-                <li>Professional report you can share with stakeholders</li>
-                <li>Follow-up from our team to discuss next steps</li>
-              </ul>
+            <h4 className="text-base font-semibold text-orange-800 mb-4">
+              What you'll receive:
+            </h4>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-sm text-orange-700">
+              <div className="flex items-center justify-center sm:justify-start">
+                <svg className="h-4 w-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>Detailed PDF business case summary</span>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start">
+                <svg className="h-4 w-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>All your inputs and calculated results</span>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start">
+                <svg className="h-4 w-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>Professional report for stakeholders</span>
+              </div>
+              <div className="flex items-center justify-center sm:justify-start">
+                <svg className="h-4 w-4 text-orange-500 mr-2 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                </svg>
+                <span>Follow-up from our team</span>
+              </div>
             </div>
           </div>
         </div>

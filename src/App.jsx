@@ -505,7 +505,7 @@ const ScratchieROICalculator = () => {
              ['Incident Cost Savings', formatCurrency(results.incidentCostSavings, currency, currencySymbol), results.calc_incidentCostSavings || ''],
              ['Hazard Reporting Efficiency', formatCurrency(results.hazardReportingValue, currency, currencySymbol), results.calc_hazardReportingValue || ''],
              ['Administrative Time Savings', formatCurrency(results.adminTimeSavingsTotal, currency, currencySymbol), results.calc_adminTimeSavingsTotal || ''],
-             ['Productivity Gain (1.5%)', formatCurrency(results.productivityGain, currency, currencySymbol), results.calc_productivityGain || ''],
+             [`Productivity Gain (${inputs.productivityGainPercent}%)`, formatCurrency(results.productivityGain, currency, currencySymbol), results.calc_productivityGain || ''],
              [{ content: 'Total Projected Benefits', styles: { fontStyle: 'bold'} }, { content: formatCurrency(results.totalBenefits, currency, currencySymbol), styles: { fontStyle: 'bold'} }, ''],
          ],
          columnStyles: { 2: { cellWidth: 'auto',  minCellWidth: 60 } }, // Allow 'Basis of Calculation' to wrap
@@ -646,7 +646,7 @@ const ScratchieROICalculator = () => {
              ['Incident Cost Savings', formatCurrency(results.incidentCostSavings, currency, currencySymbol), results.calc_incidentCostSavings || ''],
              ['Hazard Reporting Efficiency', formatCurrency(results.hazardReportingValue, currency, currencySymbol), results.calc_hazardReportingValue || ''],
              ['Administrative Time Savings', formatCurrency(results.adminTimeSavingsTotal, currency, currencySymbol), results.calc_adminTimeSavingsTotal || ''],
-             ['Productivity Gain (1.5%)', formatCurrency(results.productivityGain, currency, currencySymbol), results.calc_productivityGain || ''],
+             [`Productivity Gain (${inputs.productivityGainPercent}%)`, formatCurrency(results.productivityGain, currency, currencySymbol), results.calc_productivityGain || ''],
              [{ content: 'Total Projected Benefits', styles: { fontStyle: 'bold'} }, { content: formatCurrency(results.totalBenefits, currency, currencySymbol), styles: { fontStyle: 'bold'} }, ''],
          ],
          columnStyles: { 2: { cellWidth: 'auto',  minCellWidth: 60 } },
