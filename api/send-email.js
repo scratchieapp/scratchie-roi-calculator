@@ -16,18 +16,19 @@ export default async function handler(req, res) {
 
     const emailContent = `
       <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <div style="background-color: #F97115; padding: 20px; text-align: center;">
-          <h1 style="color: white; margin: 0;">Thank you for using the Scratchie ROI Calculator!</h1>
+        <div style="background-color: #F97115; padding: 30px; text-align: center;">
+          <img src="https://i.imgur.com/5rZ46ei.png" alt="Scratchie Logo" style="width: 50%; max-width: 300px; height: auto; margin-bottom: 20px;" />
+          <h1 style="color: white; margin: 0; font-size: 24px;">Thank you for using the Scratchie ROI Calculator!</h1>
         </div>
         
         <div style="padding: 30px; background-color: #f9f9f9;">
-          <p>Hi there,</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">Hi there,</p>
           
-          <p>Thank you for taking the time to explore how Scratchie can benefit your organization. Your personalized ROI summary is attached to this email.</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">Thank you for taking the time to explore how Scratchie can benefit your organization. Your personalized ROI summary is attached to this email.</p>
           
-          <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 20px 0; border-left: 4px solid #F97115;">
-            <h3 style="color: #F97115; margin-top: 0;">Your ROI Summary Highlights:</h3>
-            <ul style="color: #4A5568;">
+          <div style="background-color: white; padding: 25px; border-radius: 8px; margin: 25px 0; border-left: 4px solid #F97115; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+            <h3 style="color: #F97115; margin-top: 0; font-size: 18px;">📊 Your ROI Summary Highlights:</h3>
+            <ul style="color: #4A5568; font-size: 15px; line-height: 1.8;">
               <li><strong>Total Investment:</strong> ${calculationData?.totalImplementationCost || 'N/A'}</li>
               <li><strong>Total Benefits:</strong> ${calculationData?.totalBenefits || 'N/A'}</li>
               <li><strong>ROI:</strong> ${calculationData?.roi || 'N/A'}%</li>
@@ -35,24 +36,28 @@ export default async function handler(req, res) {
             </ul>
           </div>
           
-          <p>We'd love to discuss these results with you and explore how we can tailor Scratchie to your specific needs.</p>
+          <p style="font-size: 16px; line-height: 1.6; color: #4A5568;">We'd love to discuss these results with you and explore how we can tailor Scratchie to your specific needs.</p>
           
-          <div style="text-align: center; margin: 30px 0;">
+          <div style="text-align: center; margin: 35px 0;">
             <a href="mailto:james@scratchie.com?subject=ROI Calculator Follow-up" 
-               style="background-color: #F97115; color: white; padding: 12px 24px; text-decoration: none; border-radius: 6px; font-weight: bold;">
-              Schedule a Discussion
+               style="background-color: #F97115; color: white; padding: 15px 30px; text-decoration: none; border-radius: 8px; font-weight: bold; font-size: 16px; display: inline-block; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+              📅 Schedule a Discussion
             </a>
           </div>
           
-          <p>Best regards,<br>
-          <strong>James Kell</strong><br>
-          Scratchie Team<br>
-          📧 james@scratchie.com<br>
-          📱 0410 133 600</p>
+          <div style="background-color: white; padding: 20px; border-radius: 8px; margin: 25px 0;">
+            <p style="margin: 0; font-size: 16px; line-height: 1.6; color: #4A5568;">
+              Best regards,<br>
+              <strong style="color: #F97115;">James Kell</strong><br>
+              <span style="color: #718096;">Scratchie Team</span><br>
+              📧 <a href="mailto:james@scratchie.com" style="color: #F97115;">james@scratchie.com</a><br>
+              📱 0410 133 600
+            </p>
+          </div>
           
           <hr style="border: none; border-top: 1px solid #e2e8f0; margin: 30px 0;">
           
-          <p style="font-size: 12px; color: #718096;">
+          <p style="font-size: 12px; color: #718096; text-align: center; line-height: 1.4;">
             This email was sent because you used our ROI Calculator. If you have any questions, please don't hesitate to reach out.
           </p>
         </div>

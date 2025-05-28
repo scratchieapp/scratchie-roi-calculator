@@ -49,12 +49,12 @@ const EmailCaptureSection = ({
         <h3 className="text-lg font-semibold text-gray-800 mb-2">
           You're almost done! 🎉
         </h3>
-        <p className="text-gray-600 mb-4">
+        <p className="text-gray-600 mb-4 max-w-2xl mx-auto">
           Enter your email address to receive your personalized ROI business case summary. 
           We'll send you a detailed PDF report that you can share with your team.
         </p>
         
-        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6">
+        <div className="bg-orange-50 border border-orange-200 rounded-lg p-4 mb-6 max-w-2xl mx-auto">
           <div className="flex items-start">
             <div className="flex-shrink-0">
               <svg className="h-5 w-5 text-orange-400 mt-0.5" viewBox="0 0 20 20" fill="currentColor">
@@ -76,9 +76,9 @@ const EmailCaptureSection = ({
         </div>
       </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4 max-w-md mx-auto">
         <div>
-          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2">
+          <label htmlFor="email" className="block text-sm font-medium text-gray-700 mb-2 text-center">
             Email Address *
           </label>
           <input
@@ -94,7 +94,7 @@ const EmailCaptureSection = ({
             disabled={isSubmitting}
           />
           {emailError && (
-            <p className="mt-1 text-sm text-red-600">{emailError}</p>
+            <p className="mt-1 text-sm text-red-600 text-center">{emailError}</p>
           )}
         </div>
 
@@ -111,7 +111,7 @@ const EmailCaptureSection = ({
           </div>
         </div>
 
-        <div className="flex justify-between items-center pt-4">
+        <div className="flex justify-center items-center pt-4 gap-4">
           <button 
             type="button"
             onClick={() => setCurrentStep(4)} 
