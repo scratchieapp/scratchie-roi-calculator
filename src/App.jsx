@@ -715,7 +715,12 @@ const ScratchieROICalculator = () => {
        });
 
        if (!hubspotResponse.ok) {
+         const hubspotError = await hubspotResponse.text();
+         console.error('HubSpot sync failed:', hubspotError);
          console.warn('HubSpot sync failed, but email was sent successfully');
+       } else {
+         const hubspotResult = await hubspotResponse.json();
+         console.log('HubSpot sync successful:', hubspotResult);
        }
 
        // Move to results page
