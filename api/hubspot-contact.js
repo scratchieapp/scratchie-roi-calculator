@@ -38,10 +38,9 @@ export default async function handler(req, res) {
         roi_percentage: calculationData?.roi || 0,
         payback_period_months: calculationData?.paybackPeriod === Infinity ? 0 : (calculationData?.paybackPeriod || 0),
         
-        // Lead source and lifecycle
+        // Standard HubSpot properties that should exist
         hs_lead_status: 'NEW',
-        lead_source: 'ROI Calculator',
-        lifecyclestage: 'lead' // Note: HubSpot uses 'lifecyclestage' not 'lifecycle_stage'
+        lifecyclestage: 'lead'
       }
     };
 
@@ -150,6 +149,7 @@ export default async function handler(req, res) {
 
 📧 Contact received PDF business case via email.
 🗓️ Generated: ${new Date().toLocaleString()}
+🔗 Source: ROI Calculator
 
 Next Steps: Follow up to discuss implementation and answer any questions.`,
         hs_timestamp: new Date().toISOString()
