@@ -30,7 +30,7 @@ const EfficiencyImpactSection = ({ inputs, handleInputChange, setCurrentStep, cu
         </div>
         <div className="flex justify-between mt-4">
             <button onClick={() => setCurrentStep(3)} className="text-gray-600 hover:text-orange-500 font-medium py-2 px-4 rounded-lg">Back</button>
-            <button onClick={() => setCurrentStep(5)} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">View ROI Summary</button>
+            <button onClick={() => setCurrentStep(5)} className="bg-green-500 hover:bg-green-600 text-white font-semibold py-3 px-6 rounded-lg shadow-md transition duration-150">Next: Get Results</button>
         </div>
     </SectionCard>
 );

@@ -9,6 +9,7 @@ import RegionIndustrySection from './components/RegionIndustrySection';
 import SiteBasicsSection from './components/SiteBasicsSection';
 import SafetyProgramSection from './components/SafetyProgramSection';
 import EfficiencyImpactSection from './components/EfficiencyImpactSection';
+import EmailCaptureSection from './components/EmailCaptureSection';
 import ROISummarySection from './components/ROISummarySection';
 import Header from './components/Header';
 import './index.css';
@@ -139,6 +140,8 @@ const getAverageWorkerCount = (peakWorkers, calculationPeriod, sector) => {
 // --- Main Calculator Component ---
 const ScratchieROICalculator = () => {
   const [currentStep, setCurrentStep] = useState(1);
+  const [userEmail, setUserEmail] = useState('');
+  const [isSubmittingEmail, setIsSubmittingEmail] = useState(false);
   const [inputs, setInputs] = useState({
     country: 'AU',
     sector: '',
@@ -376,7 +379,7 @@ const ScratchieROICalculator = () => {
      return { text: "Consider", className: "bg-orange-500 text-white" };
    };
 
-  const generatePDF = () => {
+  const generatePDFData = () => {
      const doc = new jsPDF();
      console.log('doc:', doc);
      console.log('doc.autoTable:', typeof doc.autoTable);
@@ -515,10 +518,217 @@ const ScratchieROICalculator = () => {
      currentY = _addText("This report provides a high-level estimate. For a detailed discussion and tailored proposal, please contact Scratchie.", 14, currentY, { fontSize: 10, maxWidth: pageWidth - 28, spacingAfter: 5 });
      currentY = _addText("James Kell | 0410 133 600 | james@scratchie.com | www.scratchie.com", 14, currentY, { fontSize: 10, color: SCRATCHIE_ORANGE, maxWidth: pageWidth - 28 });
  
+     // Return the PDF as base64 data instead of saving
+     return doc.output('datauristring').split(',')[1]; // Remove data:application/pdf;base64, prefix
+   };
+
+   const generatePDF = () => {
+     const doc = new jsPDF();
+     // ... same PDF generation logic but save to file
+     const pageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+     const pageWidth = doc.internal.pageSize.width || doc.internal.pageSize.getWidth();
+     let currentY = 15;
+
+     const _addText = (text, x, y, options = {}) => {
+         const docPageHeight = doc.internal.pageSize.height || doc.internal.pageSize.getHeight();
+         const fontSize = options.fontSize || 10;
+         doc.setFontSize(fontSize);
+         const lineHeight = doc.getLineHeight(text) / doc.internal.scaleFactor;
+         
+         const textLines = doc.splitTextToSize(text, options.maxWidth || (pageWidth - x - (options.marginRight || x)));
+         const textBlockHeight = textLines.length * lineHeight * 0.9;
+
+         if (y + textBlockHeight > docPageHeight - (options.marginBottom || 20) ) {
+             doc.addPage();
+             y = options.newY || 20; 
+         }
+         
+         doc.setTextColor(options.color || SCRATCHIE_TEXT_GRAY);
+         if (options.fontStyle) {
+             doc.setFont(undefined, options.fontStyle);
+         }
+         doc.text(textLines, x, y, { align: options.align || 'left' });
+         if (options.fontStyle) { 
+             doc.setFont(undefined, 'normal');
+         }
+         return y + textBlockHeight + (options.spacingAfter || 2);
+     };
+     
+     const _addSectionTitle = (title, y) => {
+         const titleHeight = 12; 
+         if (y + titleHeight > pageHeight - 20) { 
+             doc.addPage();
+             y = 20;
+         }
+         doc.setFontSize(14);
+         doc.setFont(undefined, 'bold');
+         doc.setTextColor(SCRATCHIE_TEXT_DARK);
+         doc.text(title, 14, y);
+         doc.setFont(undefined, 'normal');
+         return y + 8; 
+     };
+
+     doc.setFontSize(20); doc.setTextColor(SCRATCHIE_ORANGE);
+     doc.text("Scratchie ROI Business Case Summary", pageWidth / 2, currentY, { align: 'center' }); currentY += 8;
+     
+     currentY = _addText(`Country: ${inputs.country} | Currency: ${currency}`, 14, currentY, { fontSize: 10, color: SCRATCHIE_TEXT_GRAY });
+     const sectorName = sectors[inputs.sector]?.name || "N/A";
+     const subSectorName = inputs.subSector && industryDefaults[inputs.country]?.[inputs.sector]?.[inputs.subSector]?.name 
+                         ? `(${industryDefaults[inputs.country][inputs.sector][inputs.subSector].name})` 
+                         : "";
+     currentY = _addText(`Sector: ${sectorName} ${subSectorName}`, 14, currentY, { fontSize: 10, color: SCRATCHIE_TEXT_GRAY });
+     currentY = _addText(`Report Generated: ${new Date().toLocaleDateString(inputs.country === 'AU' ? 'en-AU' : 'en-US')}`, 14, currentY, { fontSize: 10, color: SCRATCHIE_TEXT_GRAY, spacingAfter: 7 });
+
+     currentY = _addSectionTitle("Key Financial Projections", currentY);
+     doc.autoTable({
+         startY: currentY, theme: 'striped',
+         head: [['Metric', 'Value']],
+         body: [
+             ['Total Investment', formatCurrency(results.totalImplementationCost, currency, currencySymbol)],
+             ['Total Benefits (Over Period)', formatCurrency(results.totalBenefits, currency, currencySymbol)],
+             ['Net Benefit', formatCurrency(results.netBenefit, currency, currencySymbol)],
+             ['Return on Investment (ROI)', `${formatNumber(results.roi)}%`],
+             ['Payback Period', `${results.paybackPeriod === Infinity ? "N/A" : formatNumber(results.paybackPeriod, 1) + ' months'}`],
+             ['Benefit-Cost Ratio', `${results.benefitCostRatio === Infinity ? "Infinite" : formatNumber(results.benefitCostRatio)} : 1`],
+         ],
+         headStyles: { fillColor: SCRATCHIE_ORANGE, textColor: '#FFFFFF' },
+         didDrawPage: (data) => { currentY = data.cursor.y + 5; }
+     });
+     if (doc.previousAutoTable && doc.previousAutoTable.finalY) currentY = doc.previousAutoTable.finalY + 10;
+
+     currentY = _addSectionTitle("Core Inputs", currentY);
+     currentY = Math.max(currentY, 20);
+     
+     const isHospitality = inputs.sector === 'Hospitality';
+     const peakWorkersLabel = isHospitality ? 'Peak Number of Crew' : 'Peak Number of Workers';
+     
+     doc.autoTable({
+         startY: currentY, theme: 'grid', columnStyles: { 0: { cellWidth: 80 } },
+         head: [['Parameter', 'Value']],
+         body: [
+             ['Calculation Period', `${formatNumber(inputs.calculationPeriod, 0)} months`],
+             [peakWorkersLabel, formatNumber(inputs.peakNumWorkers, 0)],
+             [`Avg. Worker Hourly Rate (${currencySymbol})`, formatCurrency(inputs.workerHourlyRate, currency, currencySymbol)],
+             [`Current Incident Rate (${trirUnit})`, formatNumber(inputs.incidentRate, 1)],
+             [`Avg. Cost per Incident (${currencySymbol})`, formatCurrency(inputs.costPerIncident, currency, currencySymbol)],
+             ['Expected Incident Reduction', `${formatNumber(inputs.incidentReduction, 0)}%`],
+             [`Monthly Cash Reward Budget/Worker (${currencySymbol})`, formatCurrency(inputs.rewardBudget, currency, currencySymbol)],
+             ['On-Site Training', inputs.includeOnSiteTraining ? `Yes (${formatCurrency(results.trainingCost, currency, currencySymbol)})` : 'No'],
+         ],
+         headStyles: { fillColor: SCRATCHIE_TEXT_DARK, textColor: '#FFFFFF' },
+         didDrawPage: (data) => { currentY = data.cursor.y + 5; }
+     });
+     if (doc.previousAutoTable && doc.previousAutoTable.finalY) currentY = doc.previousAutoTable.finalY + 10;
+
+     currentY = _addSectionTitle("Implementation Costs Breakdown", currentY);
+     currentY = Math.max(currentY, 20);
+     doc.autoTable({
+         startY: currentY, theme: 'striped',
+         head: [['Cost Component', 'Amount']],
+         body: [
+             ['Platform Fee', formatCurrency(results.platformFee, currency, currencySymbol)],
+             ['Total Reward Budget', formatCurrency(results.rewardBudgetTotal, currency, currencySymbol)],
+             ['On-Site Training Cost', formatCurrency(results.trainingCost, currency, currencySymbol)],
+             ['Admin Setup Cost (Internal)', formatCurrency(results.adminSetupCost, currency, currencySymbol)],
+             [{ content: 'Total Implementation Cost', styles: { fontStyle: 'bold'} }, { content: formatCurrency(results.totalImplementationCost, currency, currencySymbol), styles: { fontStyle: 'bold'} }],
+         ],
+         headStyles: { fillColor: SCRATCHIE_ORANGE, textColor: '#FFFFFF' },
+         didDrawPage: (data) => { currentY = data.cursor.y + 5; }
+     });
+     if (doc.previousAutoTable && doc.previousAutoTable.finalY) currentY = doc.previousAutoTable.finalY + 10;
+     
+     currentY = _addSectionTitle("Benefits Breakdown Details", currentY);
+     currentY = Math.max(currentY, 20);
+     doc.autoTable({
+         startY: currentY, theme: 'striped',
+         head: [['Benefit Category', 'Projected Value', 'Basis of Calculation']],
+         body: [
+             ['Incident Cost Savings', formatCurrency(results.incidentCostSavings, currency, currencySymbol), results.calc_incidentCostSavings || ''],
+             ['Hazard Reporting Efficiency', formatCurrency(results.hazardReportingValue, currency, currencySymbol), results.calc_hazardReportingValue || ''],
+             ['Administrative Time Savings', formatCurrency(results.adminTimeSavingsTotal, currency, currencySymbol), results.calc_adminTimeSavingsTotal || ''],
+             ['Productivity Gain (1.5%)', formatCurrency(results.productivityGain, currency, currencySymbol), results.calc_productivityGain || ''],
+             [{ content: 'Total Projected Benefits', styles: { fontStyle: 'bold'} }, { content: formatCurrency(results.totalBenefits, currency, currencySymbol), styles: { fontStyle: 'bold'} }, ''],
+         ],
+         columnStyles: { 2: { cellWidth: 'auto',  minCellWidth: 60 } },
+         headStyles: { fillColor: SCRATCHIE_GREEN, textColor: '#FFFFFF' },
+         didDrawPage: (data) => { currentY = data.cursor.y + 5; }
+     });
+     if (doc.previousAutoTable && doc.previousAutoTable.finalY) currentY = doc.previousAutoTable.finalY + 10;
+
+     currentY = _addSectionTitle("Next Steps", currentY);
+     currentY = _addText("This report provides a high-level estimate. For a detailed discussion and tailored proposal, please contact Scratchie.", 14, currentY, { fontSize: 10, maxWidth: pageWidth - 28, spacingAfter: 5 });
+     currentY = _addText("James Kell | 0410 133 600 | james@scratchie.com | www.scratchie.com", 14, currentY, { fontSize: 10, color: SCRATCHIE_ORANGE, maxWidth: pageWidth - 28 });
+
      doc.save(`Scratchie_ROI_Summary_${inputs.country}.pdf`);
    };
 
-  const totalSteps = 5;
+   const handleEmailSubmit = async (email) => {
+     setIsSubmittingEmail(true);
+     setUserEmail(email);
+
+     try {
+       // Generate PDF data
+       const pdfData = generatePDFData();
+       
+       // Prepare calculation data for email (formatted) and HubSpot (raw numbers)
+       const emailCalculationData = {
+         totalImplementationCost: formatCurrency(results.totalImplementationCost, currency, currencySymbol),
+         totalBenefits: formatCurrency(results.totalBenefits, currency, currencySymbol),
+         roi: formatNumber(results.roi),
+         paybackPeriod: results.paybackPeriod === Infinity ? "N/A" : formatNumber(results.paybackPeriod, 1),
+         country: inputs.country
+       };
+
+       const hubspotCalculationData = {
+         ...results, // Raw numeric values for HubSpot custom properties
+         country: inputs.country
+       };
+
+       // Send email with PDF
+       const emailResponse = await fetch('/api/send-email', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           email,
+           pdfData,
+           calculationData: emailCalculationData
+         }),
+       });
+
+       if (!emailResponse.ok) {
+         throw new Error('Failed to send email');
+       }
+
+       // Sync with HubSpot
+       const hubspotResponse = await fetch('/api/hubspot-contact', {
+         method: 'POST',
+         headers: {
+           'Content-Type': 'application/json',
+         },
+         body: JSON.stringify({
+           email,
+           calculationData: hubspotCalculationData,
+           inputs
+         }),
+       });
+
+       if (!hubspotResponse.ok) {
+         console.warn('HubSpot sync failed, but email was sent successfully');
+       }
+
+       // Move to results page
+       setCurrentStep(6);
+     } catch (error) {
+       console.error('Error submitting email:', error);
+       throw error;
+     } finally {
+       setIsSubmittingEmail(false);
+     }
+   };
+
+  const totalSteps = 6;
   const progressPercentage = (currentStep / totalSteps) * 100;
 
   return (
@@ -574,6 +784,14 @@ const ScratchieROICalculator = () => {
             )}
 
             {currentStep === 5 && (
+                <EmailCaptureSection
+                    setCurrentStep={setCurrentStep}
+                    onEmailSubmit={handleEmailSubmit}
+                    isSubmitting={isSubmittingEmail}
+                />
+            )}
+
+            {currentStep === 6 && (
                 <ROISummarySection
                     results={results}
                     inputs={inputs}
@@ -588,6 +806,7 @@ const ScratchieROICalculator = () => {
                     sensitivityScenarios={sensitivityScenarios}
                     setCurrentStep={setCurrentStep}
                     generatePDF={generatePDF}
+                    userEmail={userEmail}
                 />
             )}
         </div>
