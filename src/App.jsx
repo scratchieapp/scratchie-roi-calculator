@@ -181,8 +181,11 @@ const ScratchieROICalculator = () => {
 
     setInputs(prev => ({
         ...prev,
-        workerHourlyRate: prev.workerHourlyRate === null ? (inputs.country === 'AU' ? 45 : 35) : prev.workerHourlyRate,
-        adminRate: prev.adminRate === null ? 45 : prev.adminRate,
+        workerHourlyRate: prev.workerHourlyRate === null ? 
+            (inputs.country === 'AU' ? 45 : 
+             inputs.country === 'SA' ? 26 : 35) : prev.workerHourlyRate,
+        adminRate: prev.adminRate === null ? 
+            (inputs.country === 'SA' ? 35 : 45) : prev.adminRate,
         // Reset sector-specific values if country changes and they were potentially from old country's defaults
         // This might be too aggressive, depends on desired UX. For now, let sector useEffect handle it.
     }));
@@ -276,7 +279,9 @@ const ScratchieROICalculator = () => {
 
     const platformFee = averageWorkerCount * 5 * safeCalculationPeriod;
     const rewardBudgetTotal = averageWorkerCount * safeRewardBudget * safeCalculationPeriod;
-    const trainingCost = includeOnSiteTraining ? (country === 'AU' ? 2000 : 1500) : 0;
+    const trainingCost = includeOnSiteTraining ? 
+        (country === 'AU' ? 2000 : 
+         country === 'SA' ? 5000 : 1500) : 0;
     const adminSetupCost = safeAdminHours * safeAdminRate;
     const totalImplementationCost = platformFee + rewardBudgetTotal + trainingCost + adminSetupCost;
 

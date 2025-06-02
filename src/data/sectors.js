@@ -1,6 +1,6 @@
 export const sectors = {
     Hospitality: { name: "Hospitality", subSectors: ['QSR', 'FSR', 'Hotels'] },
-    Construction: { name: "Construction", subSectors: ['Residential', 'Commercial', 'Infrastructure', 'Industrial'] },
+    Construction: { name: "Construction", subSectors: ['Residential', 'Commercial', 'Infrastructure', 'Industrial', 'Shipbuilding'] },
     Manufacturing: { name: "Manufacturing" },
     Logistics: { name: "Logistics", subSectors: ['Warehousing', 'Trucking'] },
     FacilitiesManagement: { name: "Facilities Management" },
